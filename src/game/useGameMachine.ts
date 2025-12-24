@@ -1,5 +1,5 @@
 import { useReducer, useEffect, useCallback } from 'react';
-import { GamePhase, generatePattern, getRoundLength, PADS } from './utils';
+import { GamePhase, generatePattern, getRoundLength } from './utils';
 import { audioManager } from './audio';
 
 export interface GameState {

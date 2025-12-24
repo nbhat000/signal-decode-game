@@ -1,6 +1,6 @@
 import { ToggleIcon } from './ToggleIcon';
 import { audioManager } from '../game/audio';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 
 interface HudProps {
   round: number;

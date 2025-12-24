@@ -50,7 +50,6 @@ export function Shell() {
               key="game"
               state={state}
               onPadClick={handleUserInput}
-              onPlaySignal={playSignal}
               onTryAgain={tryAgain}
             />
           )}

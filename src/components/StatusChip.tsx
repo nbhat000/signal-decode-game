@@ -5,15 +5,6 @@ interface StatusChipProps {
 }
 
 export function StatusChip({ status }: StatusChipProps) {
-  const variants = {
-    PLAYING: { color: '#00d4ff', glow: '0 0 12px rgba(0, 212, 255, 0.4)' },
-    'YOUR TURN': { color: '#a855f7', glow: '0 0 12px rgba(168, 85, 247, 0.4)' },
-    SUCCESS: { color: '#10b981', glow: '0 0 12px rgba(16, 185, 129, 0.4)' },
-    FAIL: { color: '#ef4444', glow: '0 0 12px rgba(239, 68, 68, 0.4)' },
-  };
-
-  const variant = variants[status];
-
   return (
     <motion.div
       initial={{ opacity: 0, scale: 0.9 }}

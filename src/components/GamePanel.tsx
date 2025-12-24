@@ -10,14 +10,12 @@ import { useEffect, useState } from 'react';
 interface GamePanelProps {
   state: GameState;
   onPadClick: (padId: string) => void;
-  onPlaySignal: () => void;
   onTryAgain: () => void;
 }
 
 export function GamePanel({
   state,
   onPadClick,
-  onPlaySignal,
   onTryAgain,
 }: GamePanelProps) {
   const [showParticles, setShowParticles] = useState(false);
@@ -102,9 +100,7 @@ export function GamePanel({
       </div>
 
       <PadGrid
-        pattern={state.pattern}
         userInput={state.userInput}
-        currentSignalIndex={state.currentSignalIndex}
         isPlayingSignal={state.isPlayingSignal}
         currentlyPlayingPad={state.currentlyPlayingPad}
         phase={state.phase}

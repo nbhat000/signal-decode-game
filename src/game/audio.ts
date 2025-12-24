@@ -73,7 +73,6 @@ function generateClick(): string {
   view.setUint32(40, numSamples * 2, true);
   
   for (let i = 0; i < numSamples; i++) {
-    const t = i / sampleRate;
     const sample = Math.random() * 0.3 * (1 - (i / numSamples));
     const intSample = Math.max(-32768, Math.min(32767, Math.floor(sample * 32767)));
     view.setInt16(44 + i * 2, intSample, true);
@@ -171,7 +170,6 @@ class AudioManager {
   private enabled: boolean = false;
   private initialized: boolean = false;
   private backgroundMusic: Howl | null = null;
-  private isGamePlaying: boolean = false;
 
   constructor() {
     const saved = localStorage.getItem('signal-decode-sound');
@@ -251,7 +249,6 @@ class AudioManager {
   }
 
   setGamePlaying(isPlaying: boolean) {
-    this.isGamePlaying = isPlaying;
     if (this.backgroundMusic) {
       // Lower volume when game is playing so game sounds aren't drowned out
       this.backgroundMusic.volume(isPlaying ? 0.15 : 0.4);

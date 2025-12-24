@@ -1,11 +1,8 @@
 import { motion } from 'framer-motion';
 import { PADS } from '../game/utils';
-import { audioManager } from '../game/audio';
 
 interface PadGridProps {
-  pattern: string[];
   userInput: string[];
-  currentSignalIndex: number;
   isPlayingSignal: boolean;
   currentlyPlayingPad: string | null;
   phase: string;
@@ -13,9 +10,7 @@ interface PadGridProps {
 }
 
 export function PadGrid({
-  pattern,
   userInput,
-  currentSignalIndex,
   isPlayingSignal,
   currentlyPlayingPad,
   phase,
