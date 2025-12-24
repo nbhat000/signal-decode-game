@@ -5,9 +5,10 @@ import { useState, useEffect } from 'react';
 interface HudProps {
   round: number;
   onHelpClick: () => void;
+  onLogoClick: () => void;
 }
 
-export function Hud({ round, onHelpClick }: HudProps) {
+export function Hud({ round, onHelpClick, onLogoClick }: HudProps) {
   const [soundEnabled, setSoundEnabled] = useState(audioManager.isEnabled());
 
   const toggleSound = () => {
@@ -19,7 +20,7 @@ export function Hud({ round, onHelpClick }: HudProps) {
   return (
     <div className="hud">
       <div className="hud-left">
-        <h1 className="hud-title">Signal Decode</h1>
+        <h1 className="hud-title" onClick={onLogoClick} style={{ cursor: 'pointer' }}>SIGNAL<br/>DECODE</h1>
       </div>
       <div className="hud-center">
         <div className="round-indicators">

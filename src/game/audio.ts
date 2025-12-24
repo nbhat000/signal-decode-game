@@ -170,6 +170,8 @@ class AudioManager {
   private sounds: Map<string, Howl> = new Map();
   private enabled: boolean = false;
   private initialized: boolean = false;
+  private backgroundMusic: Howl | null = null;
+  private isGamePlaying: boolean = false;
 
   constructor() {
     const saved = localStorage.getItem('signal-decode-sound');
@@ -204,6 +206,14 @@ class AudioManager {
       volume: 0.6,
     }));
 
+    // Initialize background music
+    this.backgroundMusic = new Howl({
+      src: ['/retro-arcade-game-music-408074.mp3'],
+      loop: true,
+      volume: 0.4, // Normal volume for home page
+      autoplay: false,
+    });
+
     this.initialized = true;
   }
 
@@ -218,10 +228,40 @@ class AudioManager {
   setEnabled(enabled: boolean) {
     this.enabled = enabled;
     localStorage.setItem('signal-decode-sound', String(enabled));
+    // Also control background music
+    if (this.backgroundMusic) {
+      if (enabled) {
+        if (!this.backgroundMusic.playing()) {
+          this.backgroundMusic.play();
+        }
+      } else {
+        this.backgroundMusic.pause();
+      }
+    }
   }
 
   isEnabled(): boolean {
     return this.enabled;
+  }
+
+  playBackgroundMusic() {
+    if (this.backgroundMusic && this.enabled && !this.backgroundMusic.playing()) {
+      this.backgroundMusic.play();
+    }
+  }
+
+  setGamePlaying(isPlaying: boolean) {
+    this.isGamePlaying = isPlaying;
+    if (this.backgroundMusic) {
+      // Lower volume when game is playing so game sounds aren't drowned out
+      this.backgroundMusic.volume(isPlaying ? 0.15 : 0.4);
+    }
+  }
+
+  stopBackgroundMusic() {
+    if (this.backgroundMusic) {
+      this.backgroundMusic.stop();
+    }
   }
 }
 

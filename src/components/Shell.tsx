@@ -3,15 +3,43 @@ import { StartScreen } from './StartScreen';
 import { GamePanel } from './GamePanel';
 import { useGameMachine } from '../game/useGameMachine';
 import { AnimatePresence, motion } from 'framer-motion';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { audioManager } from '../game/audio';
 
 export function Shell() {
   const { state, startGame, playSignal, handleUserInput, tryAgain, reset } = useGameMachine();
   const [showHelp, setShowHelp] = useState(false);
 
+  // Initialize audio and start background music
+  useEffect(() => {
+    audioManager.init();
+    audioManager.playBackgroundMusic();
+  }, []);
+
+  // Adjust background music volume based on game state
+  useEffect(() => {
+    const isGameActive = state.phase !== 'intro';
+    audioManager.setGamePlaying(isGameActive);
+  }, [state.phase]);
+
+  // Auto-play signal when entering ready phase
+  useEffect(() => {
+    if (state.phase === 'ready') {
+      // Small delay to ensure UI is ready
+      const timer = setTimeout(() => {
+        playSignal();
+      }, 300);
+      return () => clearTimeout(timer);
+    }
+  }, [state.phase, playSignal]);
+
   return (
     <div className="shell">
-      <Hud round={state.round} onHelpClick={() => setShowHelp(!showHelp)} />
+      <Hud 
+        round={state.round} 
+        onHelpClick={() => setShowHelp(!showHelp)}
+        onLogoClick={reset}
+      />
       
       <main className="main-content">
         <AnimatePresence mode="wait">
@@ -28,13 +56,6 @@ export function Shell() {
           )}
         </AnimatePresence>
       </main>
-
-      <footer className="footer">
-        <p>Vibe Prototype • No backend • Built fast</p>
-        <button className="reset-link" onClick={reset}>
-          Reset
-        </button>
-      </footer>
 
       {showHelp && (
         <div className="help-overlay" onClick={() => setShowHelp(false)}>

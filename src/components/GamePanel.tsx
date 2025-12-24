@@ -2,6 +2,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { PadGrid } from './PadGrid';
 import { StatusChip } from './StatusChip';
 import { ParticleBurst } from './ParticleBurst';
+import { Waveform } from './Waveform';
 import { GameState } from '../game/useGameMachine';
 import { audioManager } from '../game/audio';
 import { useEffect, useState } from 'react';
@@ -21,6 +22,7 @@ export function GamePanel({
 }: GamePanelProps) {
   const [showParticles, setShowParticles] = useState(false);
   const [showFail, setShowFail] = useState(false);
+  const [lastUserInputPad, setLastUserInputPad] = useState<string | null>(null);
 
   useEffect(() => {
     if (state.phase === 'success') {
@@ -38,18 +40,30 @@ export function GamePanel({
     }
   }, [state.phase]);
 
-  const getStatus = (): 'PLAYING' | 'YOUR TURN' | 'SUCCESS' | 'FAIL' | 'READY' => {
+  // Track last user input for waveform
+  useEffect(() => {
+    if (state.phase === 'input' && state.userInput.length > 0) {
+      const lastPad = state.userInput[state.userInput.length - 1];
+      setLastUserInputPad(lastPad);
+      // Clear after a short delay
+      const timer = setTimeout(() => setLastUserInputPad(null), 200);
+      return () => clearTimeout(timer);
+    } else {
+      setLastUserInputPad(null);
+    }
+  }, [state.userInput, state.phase]);
+
+  const getStatus = (): 'PLAYING' | 'YOUR TURN' | 'SUCCESS' | 'FAIL' | null => {
     if (state.phase === 'playing') return 'PLAYING';
     if (state.phase === 'input') return 'YOUR TURN';
     if (state.phase === 'success') return 'SUCCESS';
     if (state.phase === 'fail') return 'FAIL';
-    return 'READY';
+    return null; // Don't show status in ready phase
   };
 
   const getSubtitle = () => {
     if (state.phase === 'playing') return 'Observe the signal';
     if (state.phase === 'input') return 'Repeat the signal';
-    if (state.phase === 'ready') return 'Ready to play';
     return '';
   };
 
@@ -77,33 +91,13 @@ export function GamePanel({
       </div>
 
       <div className="signal-visualization">
-        <StatusChip status={getStatus()} />
+        {getStatus() && <StatusChip status={getStatus()!} />}
         <div className="wave-container">
-          <svg className="wave" viewBox="0 0 200 40" preserveAspectRatio="none">
-            <motion.path
-              d="M 0,20 Q 50,10 100,20 T 200,20"
-              stroke="currentColor"
-              strokeWidth="2"
-              fill="none"
-              initial={{ pathLength: 0, opacity: 0.3 }}
-              animate={{
-                pathLength: state.phase === 'playing' ? [0, 1, 0] : 0.3,
-                opacity: state.phase === 'playing' ? [0.3, 0.9, 0.3] : 0.3,
-              }}
-              transition={{
-                pathLength: { 
-                  duration: state.pattern.length * 0.6, 
-                  repeat: state.phase === 'playing' ? Infinity : 0, 
-                  ease: 'linear' 
-                },
-                opacity: {
-                  duration: state.pattern.length * 0.6,
-                  repeat: state.phase === 'playing' ? Infinity : 0,
-                  ease: 'linear',
-                },
-              }}
-            />
-          </svg>
+          <Waveform
+            isActive={state.phase === 'playing' || state.phase === 'input'}
+            currentlyPlayingPad={state.currentlyPlayingPad}
+            userInputPad={lastUserInputPad}
+          />
         </div>
       </div>
 
@@ -119,20 +113,6 @@ export function GamePanel({
 
       <div className="panel-actions">
         <AnimatePresence mode="wait">
-          {state.phase === 'ready' && (
-            <motion.button
-              key="play"
-              className="action-button"
-              onClick={onPlaySignal}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.9 }}
-            >
-              Play Signal
-            </motion.button>
-          )}
           {state.phase === 'fail' && (
             <motion.button
               key="try-again"
