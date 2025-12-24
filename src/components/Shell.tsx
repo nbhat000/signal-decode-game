@@ -15,19 +15,31 @@ export function Shell() {
     audioManager.init();
   }, []);
 
-  // Start background music on first user interaction (browsers block autoplay)
+  // Auto-trigger click to start background music (bypasses autoplay restrictions)
   useEffect(() => {
     const startMusic = () => {
       audioManager.playBackgroundMusic();
-      // Remove listeners after first interaction
+      // Remove listeners after music starts
       document.removeEventListener('click', startMusic);
       document.removeEventListener('touchstart', startMusic);
     };
     
+    // Set up listeners for manual interactions
     document.addEventListener('click', startMusic, { once: true });
     document.addEventListener('touchstart', startMusic, { once: true });
     
+    // Auto-trigger a click event after a short delay to start music
+    const autoClickTimer = setTimeout(() => {
+      const clickEvent = new MouseEvent('click', {
+        bubbles: true,
+        cancelable: true,
+        view: window
+      });
+      document.dispatchEvent(clickEvent);
+    }, 100);
+    
     return () => {
+      clearTimeout(autoClickTimer);
       document.removeEventListener('click', startMusic);
       document.removeEventListener('touchstart', startMusic);
     };
