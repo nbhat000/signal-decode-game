@@ -10,10 +10,27 @@ export function Shell() {
   const { state, startGame, playSignal, handleUserInput, tryAgain, reset } = useGameMachine();
   const [showHelp, setShowHelp] = useState(false);
 
-  // Initialize audio and start background music
+  // Initialize audio
   useEffect(() => {
     audioManager.init();
-    audioManager.playBackgroundMusic();
+  }, []);
+
+  // Start background music on first user interaction (browsers block autoplay)
+  useEffect(() => {
+    const startMusic = () => {
+      audioManager.playBackgroundMusic();
+      // Remove listeners after first interaction
+      document.removeEventListener('click', startMusic);
+      document.removeEventListener('touchstart', startMusic);
+    };
+    
+    document.addEventListener('click', startMusic, { once: true });
+    document.addEventListener('touchstart', startMusic, { once: true });
+    
+    return () => {
+      document.removeEventListener('click', startMusic);
+      document.removeEventListener('touchstart', startMusic);
+    };
   }, []);
 
   // Adjust background music volume based on game state

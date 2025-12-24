@@ -206,7 +206,7 @@ class AudioManager {
 
     // Initialize background music
     this.backgroundMusic = new Howl({
-      src: ['/retro-arcade-game-music-408074.mp3'],
+      src: [`${import.meta.env.BASE_URL}retro-arcade-game-music-408074.mp3`],
       loop: true,
       volume: 0.4, // Normal volume for home page
       autoplay: false,
@@ -244,7 +244,12 @@ class AudioManager {
 
   playBackgroundMusic() {
     if (this.backgroundMusic && this.enabled && !this.backgroundMusic.playing()) {
-      this.backgroundMusic.play();
+      try {
+        this.backgroundMusic.play();
+      } catch (error) {
+        // Autoplay may be prevented by browser
+        console.log('Background music autoplay prevented:', error);
+      }
     }
   }
 
